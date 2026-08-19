@@ -1,0 +1,26 @@
+{
+  "id": "visa-t",
+  "relief": "T-Visa (8 USC 1101(a)(15)(T))",
+  "prompt_version": "evidence-v1.2",
+  "prompt": {
+    "reasoning": "prompt/reasoning.md",
+    "contract": "prompt/contract.md",
+    "assemble": "prompt/assemble.md"
+  },
+  "model": {
+    "default": "claude-sonnet-4-6",
+    "note": "Default del runner. Override por env (ANTHROPIC_MODEL / AI_PROVIDER). El razonamiento fino del specialist corre mejor en un modelo pesado; sonnet-4-6 es el default del harness de evals."
+  },
+  "params": {
+    "max_tokens": 4096,
+    "cache": true
+  },
+  "evals": {
+    "runner": "tools/eval-runner/eval-skill.mjs",
+    "golden": "evals/golden/",
+    "baseline": "evals/baseline.json",
+    "command": "node --env-file=.env tools/eval-runner/eval-skill.mjs --skill visa-t --prompt-file <ensamble> --prompt-version evidence-v1.2"
+  },
+  "estado": "vivo",
+  "notas": "Límite conocido: la declaración del descarte estructural (bright_line_no) es estocásticamente inestable entre corridas — ver PHILOSOPHY.md §5. Remedio identificado: routing determinístico + few-shots por pregunta (el mapa de retrieval/ es su esqueleto)."
+}
