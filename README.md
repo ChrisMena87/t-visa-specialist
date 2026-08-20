@@ -71,4 +71,4 @@ Apache License 2.0 — ver [`LICENSE`](./LICENSE).
 
 ## Autoría
 
-Law Office of Manuel Solis · [github.com/chrismena87](https://github.com/chrismena87)
+Christopher Mena · [github.com/chrismena87](https://github.com/chrismena87)
