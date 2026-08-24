@@ -2,6 +2,13 @@
 
 ### Criterios de diseño del T-Visa specialist
 
+> [!CAUTION]
+> **This software is not a substitute for the advice of an attorney. / Este software no sustituye el
+> consejo de un abogado.** Es un laboratorio experimental: no está en producción, no se ha utilizado
+> para evaluar ningún caso de ningún cliente, y ninguna decisión legal o comercial se ha tomado a
+> partir de esta herramienta. Uso previsto: bajo supervisión de abogados con licencia. Ver el aviso
+> completo en el [README](./README.md).
+
 ---
 
 ## 1. Por qué existe
