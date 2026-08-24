@@ -1,91 +1,92 @@
-**Español** · [English](./README.en.md)
+**English** · [Español](./README.es.md)
 
 # T-Visa Specialist
 
 > [!CAUTION]
-> # ⚠️ LABORATORIO EXPERIMENTAL — NO USAR EN PRODUCCIÓN
+> # ⚠️ EXPERIMENTAL LABORATORY — NOT FOR PRODUCTION USE
 >
+> ### **This software is not a substitute for the advice of an attorney.**
 > ### **Este software no sustituye el consejo de un abogado.**
 >
-> - **No está en producción.** Este sistema no se ha utilizado para evaluar ningún caso de ningún
->   cliente. **Ninguna decisión legal ni comercial se ha tomado a partir de esta herramienta.**
-> - **No reemplaza el juicio humano — por diseño.** Sus salidas nunca son determinaciones de
->   elegibilidad: organizan evidencia para profesionales con licencia, que toman todas las decisiones.
-> - **El corpus legal es un snapshot con fecha** (ver [`corpus/MANIFEST.md`](./corpus/MANIFEST.md)).
->   La ley cambia — verifica siempre contra fuente primaria.
+> - **Not in production.** This system has never been used to evaluate any client's case.
+>   **No legal or commercial decision has ever been made based on this tool.**
+> - **It does not replace human judgment — by design.** Its outputs are never eligibility
+>   determinations: they organize evidence for licensed professionals, who make every decision.
+> - **The embedded legal corpus is a dated snapshot** (see [`corpus/MANIFEST.md`](./corpus/MANIFEST.md)).
+>   The law changes — always verify against primary sources.
 >
-> **Uso previsto:** investigación, evaluación y operación bajo supervisión de abogados con licencia.
-> Cualquier otro uso queda fuera del diseño y de la intención de este proyecto.
+> **Intended use:** research, evaluation, and operation under the supervision of licensed attorneys.
+> Any other use is outside the design and the intent of this project.
 
-Un agente de análisis para T-Visa (`8 USC 1101(a)(15)(T)`) — evalúa evidencia de un intake contra el
-canon legal y reporta qué elementos captura y en qué estado. Se entrega como paquete standalone: prompt,
-corpus legal embebido con procedencia trazable, un mapa de retrieval determinístico, y el runner que lo
-evalúa.
+An analysis agent for the T-Visa (`8 USC 1101(a)(15)(T)`) — it evaluates intake evidence against the
+legal canon and reports which elements it captures and in what state. It ships as a standalone package:
+the prompt, an embedded legal corpus with traceable provenance, a deterministic retrieval map, and the
+runner that evaluates it.
 
-## Lo que este agente NO hace
+## What this agent does NOT do
 
-> **Las skills de análisis nunca deciden elegibilidad. Su salida es soporte cognitivo para el paralegal
-> y el abogado, no juicio adjudicativo del sistema.**
+> **Analysis skills never decide eligibility. Their output is cognitive support for the paralegal and
+> the attorney, not the system's adjudicative judgment.**
 
-Este es el principio que gobierna todo el diseño, no una capa de seguridad agregada al final. El agente
-no dice si un caso "vende" ni asigna una etiqueta de fortaleza. Emite, por cada uno de los seis elementos
-del alivio (Acto · Medios · Fin · Presencia · Cooperación · Hardship), uno de cuatro estados —
-`present` / `no_confirmado` / `bright_line_no` / `no_aplica` — cada uno con su ancla textual al intake.
-Ninguno es una conclusión sobre el caso. La decisión de elegibilidad y de filing es siempre de un humano
-con licencia profesional.
+This is the principle that governs the entire design, not a safety layer bolted on at the end. The
+agent does not say whether a case "sells", nor does it assign a strength label. For each of the relief's
+six elements (Act · Means · Purpose · Physical Presence · Cooperation · Hardship), it emits one of four
+states — `present` / `no_confirmado` / `bright_line_no` / `no_aplica` — each anchored to specific text in
+the intake. None of them is a conclusion about the case. The decision on eligibility and on filing always
+belongs to a licensed human professional.
 
-El porqué de fondo — automation bias, la diferencia entre gradiente fáctico y gradiente adjudicativo, y
-por qué "fortaleza" no es una propiedad que el sistema pueda conocer — está desarrollado en
-**[`PHILOSOPHY.md`](./PHILOSOPHY.md)**.
+The underlying reasoning — automation bias, the difference between the factual gradient and the
+adjudicative gradient, and why "strength" isn't a property the system can know — is developed in
+**[`PHILOSOPHY.en.md`](./PHILOSOPHY.md)**.
 
-## Qué contiene el paquete
+## What the package contains
 
 ```
-prompt/       el razonamiento + el contrato de output (el agente)
-corpus/       el canon legal embebido, con procedencia (MANIFEST.md)
-retrieval/    mapa determinístico: qué archivo resuelve cada duda
-skills/       capacidades del agente, desglosadas y auditables
-config/       versión viva, modelo, parámetros (agent.json)
-evals/        vacío de casos — ver "Evaluá con tu propio golden" ↓
+prompt/       the reasoning + the output contract (the agent)
+corpus/       the embedded legal canon, with provenance (MANIFEST.md)
+retrieval/    deterministic map: which file resolves each question
+skills/       the agent's capabilities, broken down and auditable
+config/       live version, model, parameters (agent.json)
+evals/        empty of cases — see "Evaluate with your own golden set" ↓
 tools/
-├── eval-runner/    el runner genérico (assemble-prompt.mjs + eval-skill.mjs)
-└── canon-watch/    vigilante de frescura del statute/regulación embebidos
+├── eval-runner/    the generic runner (assemble-prompt.mjs + eval-skill.mjs)
+└── canon-watch/    watchdog for the freshness of the embedded statute/regulation
 ```
 
-Cada carpeta tiene su propio README con una línea por archivo y un puntero a
-[`retrieval/retrieval-map.md`](./retrieval/retrieval-map.md) como índice maestro — el agente nunca
-adivina dónde buscar una fuente, y tampoco debería quien lo lee.
+Each folder has its own README with one line per file, and a pointer to
+[`retrieval/retrieval-map.md`](./retrieval/retrieval-map.md) as the master index — the agent never
+guesses where to look for a source, and neither should whoever reads it.
 
-## Evaluá con tu propio golden
+## Evaluate with your own golden set
 
-Este paquete llega **sin** casos de prueba. Cada firma valida contra su propia práctica, no contra la
-ajena — ver [`evals/README.md`](./evals/README.md) para el porqué y cómo construir el tuyo. En resumen,
-desde la raíz del repo:
+This package ships **without** test cases. Each firm validates against its own practice, not someone
+else's — see [`evals/README.md`](./evals/README.md) for the why and how to build your own. In short,
+from the root of the repo:
 
 ```bash
-# ensamblar el prompt vivo
+# assemble the live prompt
 node tools/eval-runner/assemble-prompt.mjs --out /tmp/assembled.md
 
-# correr contra tu golden
+# run against your golden set
 node --env-file=.env tools/eval-runner/eval-skill.mjs \
-  --skill visa-t --prompt-file /tmp/assembled.md --prompt-version <la-tuya>
+  --skill visa-t --prompt-file /tmp/assembled.md --prompt-version <yours>
 ```
 
-## Frescura del canon legal
+## Freshness of the legal canon
 
 ```bash
 node tools/canon-watch/check-canon-freshness.mjs
 ```
 
-Compara el statute y la regulación embebidos contra la fuente oficial (eCFR, govinfo/GPO) y **reporta**
-si quedaron desactualizados — nunca actualiza el canon por su cuenta. Ver el script y
-[`corpus/MANIFEST.md`](./corpus/MANIFEST.md) § "Vigilancia del canon" para el Policy Manual y la
-jurisprudencia, que no tienen una API de versionado equivalente.
+It compares the embedded statute and regulation against the official source (eCFR, govinfo/GPO) and
+**reports** whether they've gone stale — it never updates the canon on its own. See the script and
+[`corpus/MANIFEST.md`](./corpus/MANIFEST.md) § "Canon monitoring" for the Policy Manual and case law,
+which don't have an equivalent versioning API.
 
-## Licencia
+## License
 
-Apache License 2.0 — ver [`LICENSE`](./LICENSE).
+Apache License 2.0 — see [`LICENSE`](./LICENSE).
 
-## Autoría
+## Authorship
 
 Christopher Mena · [github.com/chrismena87](https://github.com/chrismena87)

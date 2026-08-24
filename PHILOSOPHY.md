@@ -1,371 +1,377 @@
-**Español** · [English](./PHILOSOPHY.en.md)
+**English** · [Español](./PHILOSOPHY.es.md)
 
-# Cómo se construye un asistente legal que no decide
+# How to build a legal assistant that does not decide
 
-### Criterios de diseño del T-Visa specialist
+### Design criteria of the T-Visa specialist
 
 > [!CAUTION]
-> **Este software no sustituye el consejo de un abogado.** Es un laboratorio experimental: no está
-> en producción, no se ha utilizado para evaluar ningún caso de ningún cliente, y ninguna decisión
-> legal o comercial se ha tomado a partir de esta herramienta. Uso previsto: bajo supervisión de
-> abogados con licencia. Ver el aviso completo en el [README](./README.md).
+> **This software is not a substitute for the advice of an attorney.**
+> **Este software no sustituye el consejo de un abogado.**
+>
+> This is an experimental
+> laboratory: it is not in production, it has not been used to evaluate any client's case, and no
+> legal or business decision has been made based on this tool. Intended use: under the supervision
+> of licensed attorneys. See the full notice in the [README](./README.md).
 
 ---
 
-## 1. Por qué existe
+## 1. Why it exists
 
-> **Democratizar el acceso a evaluaciones y servicios legales de calidad y costo accesible para
-> aquellos que no podrían pagar una firma seria.**
-> — ADR-027, *Vocación del proyecto: el círculo dorado*
+> **Democratize access to quality, affordable legal evaluations and services for those who could not
+> afford a serious firm.**
+> — ADR-027, *Project vocation: the golden circle*
 
-Cuatro palabras hacen el trabajo. **Democratizar**: el cliente que importa por defecto es el que hoy no
-tiene acceso. **Evaluaciones y servicios**: no sólo actuar, también analizar — el sistema sirve cuando
-alguien viene a saber qué tiene, incluso si no contrata. **Calidad**: no se rebaja para abaratar; la
-democratización pierde sentido si la versión accesible es peor. **Costo accesible**: no necesariamente
-gratis, sí alcanzable para el segmento desatendido.
+Four words do the work. **Democratize**: the client who matters by default is the one who lacks access
+today. **Evaluations and services**: not only acting, also analyzing — the system serves when someone
+comes to find out what they have, even if they never retain counsel. **Quality**: not lowered to cut
+cost; democratization loses its point if the accessible version is worse. **Affordable cost**: not
+necessarily free, but reachable for the underserved segment.
 
-Una distinción que conviene decir en voz alta porque casi nadie la dice: **el beachhead comercial y el
-destinatario último no son la misma persona.** Quien paga primero puede ser una firma boutique; a quien
-se le debe el producto en última instancia es a la persona desatendida. Confundirlos es cómo un
-proyecto con vocación termina construyendo sólo para quien firma el cheque.
+A distinction worth saying out loud, because almost no one says it: **the commercial beachhead and the
+ultimate beneficiary are not the same person.** Whoever pays first may be a boutique firm; who the
+product is ultimately owed to is the underserved person. Conflating the two is how a mission-driven
+project ends up building only for whoever signs the check.
 
-De ahí sale la regla de qué construimos y qué no. La AI hace **lo que es inherentemente AI** —operar
-sobre el corpus completo a la vez, memoria sin fatiga, ausencia de sesgo de orden, ausencia de
-tribalismo entre áreas legales—. La AI **no hace** lo que es inherentemente humano: empatía, rapport,
-juicio social, lectura de credibilidad, presencia. Cuando la máquina absorbe la carga cognitiva fría, el
-abogado queda libre para ser lo que el cliente desatendido más necesita: alguien que entiende su
-historia y lo acompaña en el tiempo. El abogado deja de ser principalmente *técnico legal* y se vuelve
-**super trabajador social** (ADR-027 §How.2).
+From that follows the rule for what we build and what we don't. AI does **what is inherently AI** —
+operating over the whole corpus at once, memory without fatigue, no ordering bias, no tribalism between
+practice areas. AI does **not** do what is inherently human: empathy, rapport, social judgment, reading
+credibility, presence. When the machine absorbs the cold cognitive load, the attorney is freed to be what
+the underserved client most needs: someone who understands their story and walks with them over time.
+The attorney stops being primarily a *legal technician* and becomes a **super social worker** (ADR-027
+§How.2).
 
-Y de ahí salen las **anti-features explícitas** — quedan fuera por vocación, no por regulación, y la
-diferencia importa porque *la regulación se sortea con asesoría legal y la vocación no* (ADR-027):
+And from that follow the **explicit anti-features** — excluded by vocation, not by regulation, and the
+difference matters because *regulation can be navigated with legal counsel and vocation cannot*
+(ADR-027):
 
-- Voice agents que fingen empatía o rapport con el cliente final.
-- "Detección de mentiras" o evaluación de credibilidad sobre el testimonio.
-- Predictores que venden certeza de outcome ("tu caso tiene 73% de probabilidad").
-- Agentes que se identifican como humanos ante el cliente final.
+- Voice agents that feign empathy or rapport with the end client.
+- "Lie detection" or credibility assessment of testimony.
+- Predictors that sell outcome certainty ("your case has a 73% chance").
+- Agents that present themselves as human to the end client.
 
-Una lista de prohibiciones que vive sólo en un documento no defiende nada, así que ésta es un **gate de
-review**: corre **antes** de mirar calidad de código, porque si el filtro falla, el código todavía no
-importa. La distinción que ordena el filtro es entre **AI generativa** —estructurar, sugerir, resumir,
-extraer, identificar candidatos para revisión profesional: sólido— y **AI predictiva vendida como
-certeza** —"tu caso ganará", "este cliente miente", "este alivio aplica" sin que un humano revise:
-snake oil estructural—. También fija cómo se enuncia el output: *"candidatos a evaluar" sí; "califica
-para X" no.*
+A list of prohibitions that lives only in a document defends nothing, so this one is a **review gate**:
+it runs **before** looking at code quality, because if the filter fails, the code doesn't matter yet.
+The distinction that organizes the filter is between **generative AI** — structuring, suggesting,
+summarizing, extracting, identifying candidates for professional review: sound — and **predictive AI
+sold as certainty** — "your case will win", "this client is lying", "this relief applies" with no human
+review: structural snake oil. It also fixes how the output is phrased: *"candidates to evaluate" yes;
+"qualifies for X" no.*
 
-Y una pregunta final que es la más incómoda y la más útil:
+And a final question that is both the most uncomfortable and the most useful:
 
-> *Si el cliente final entendiera exactamente qué hace esta feature, qué datos usa, y cuál es su tasa
-> de error real — ¿la usaría con la misma confianza?*
+> *If the end client understood exactly what this feature does, what data it uses, and its real error
+> rate — would they use it with the same confidence?*
 
-Si la respuesta es "probablemente no", la feature **se está vendiendo mejor de lo que es**. Eso es snake
-oil sin importar la sofisticación técnica que tenga (`docs/snake-oil-filter.md`).
-
----
-
-## 2. No-adjudicación: el principio constitutivo
-
-> **Las skills de análisis NUNCA deciden elegibilidad.** Su salida es soporte cognitivo para el
-> paralegal y el abogado, no juicio adjudicativo del sistema.
-> — el séptimo principio del proyecto
-
-Este es el principio del que cuelga todo lo demás. No es una capa de seguridad agregada al final: es la
-forma del sistema.
-
-El modo de falla que previene es **estructural, no tecnológico**. Está documentado en la literatura de
-aviación y medicina como *automation bias*: cuando un sistema —con AI o sin ella, da igual— ocupa el
-espacio del juicio humano, la responsabilidad se diluye entre capas. Cada capa confía en la siguiente.
-El resultado puede ser fraude deliberado (el profesional se escuda en "el sistema lo aprobó") o
-negligencia distribuida: nadie decide mal, todos confían en la capa anterior, y el cliente termina con
-un filing débil o un retainer cobrado sin posibilidad real de aprobación.
-
-En visas humanitarias el daño **siempre cae del mismo lado**: exposición a enforcement, denegaciones,
-dinero gastado por personas que no lo tenían.
-
-El mecanismo concreto que lo dispara es banal y por eso peligroso. El flujo real de una firma es
-`intaker → paralegal QA junior → abogado que firma`, y el abogado revisa a velocidad de *"50 intakes en
-5 minutos"*. **Si la skill ocupa el espacio cognitivo del paralegal con un veredicto cerrado, el
-paralegal hace eco; si el paralegal hace eco, el abogado firma sobre eco.** La cadena de revisión se
-colapsa sin que nadie haya hecho nada malo (ADR-032, Contexto).
-
-Por eso los disclaimers no alcanzan. Se consideró explícitamente mantener las etiquetas conclusivas
-agregando advertencias fuertes, y se rechazó: *"los disclaimers no protegen del automation bias… el
-paralegal junior lee el label, no el disclaimer. **La palabra es el sesgo.**"* (ADR-032, Alternativas).
+If the answer is "probably not", the feature **is being sold as better than it is**. That is snake oil
+regardless of how technically sophisticated it is (`docs/snake-oil-filter.md`).
 
 ---
 
-## 3. Evaluación de evidencia, no veredicto
+## 2. Non-adjudication: the constitutive principle
 
-La primera versión del sistema clasificaba casos como `VENDE_ALTA`, `VENDE_CAVEATS`, `NO_VENDE`. Esa
-taxonomía **está muerta** y vale explicar por qué, porque el porqué es más útil que el reemplazo.
+> **Analysis skills NEVER decide eligibility.** Their output is cognitive support for the paralegal
+> and the attorney, not the system's adjudicative judgment.
+> — the project's seventh principle
 
-### Había dos gradientes, no uno
+This is the principle everything else hangs from. It is not a safety layer bolted on at the end: it is
+the shape of the system.
 
-- **Gradiente fáctico** — ¿los hechos que constituyen los elementos están establecidos en el intake?
-  **Sí es del sistema.** Es verificable contra el formulario y el intake.
-- **Gradiente adjudicativo** — dados los hechos, ¿el caso es A/B/C para que la agencia lo apruebe?
-  **No es del sistema.** Es del abogado, y es **apetito de riesgo del negocio**: dos abogados
-  competentes califican distinto el mismo intake porque tienen apetitos distintos. Algunas firmas
-  venden sólo A; otras venden A/B/C.
+The failure mode it prevents is **structural, not technological**. It is documented in the aviation and
+medicine literature as *automation bias*: when a system — with AI or without it, it makes no difference
+— occupies the space of human judgment, responsibility dilutes across layers. Each layer trusts the
+next. The result can be deliberate fraud (the professional hides behind "the system approved it") or
+distributed negligence: nobody decides wrongly, everyone trusts the prior layer, and the client ends up
+with a weak filing or a retainer charged with no real chance of approval.
 
-De ahí la razón profunda, más fuerte que la regla: **la skill no puede clasificar fortaleza porque la
-fortaleza no es propiedad del caso.** Es función de la lente del abogado. Cualquier etiqueta de fuerza
-que el sistema emita pretende conocer un apetito de riesgo que no le pertenece — y ese pretendido
-conocimiento se convierte en escudo ("el sistema lo aprobó"), que es exactamente la trampa (ADR-034).
+In humanitarian visas the harm **always falls on the same side**: exposure to enforcement, denials,
+money spent by people who didn't have it to spend.
 
-Había también un problema mecánico: las siete categorías originales eran **un gradiente disfrazado de
-clases**. Entre "fuerte" y "parcial" no hay frontera objetiva. Pedirle a un modelo que clasifique un
-continuo en clases discretas hace que colapse hacia la categoría más simple. Ningún refinamiento del
-prompt lo arregla: **el bug emerge del marco, no del modelo** (ADR-034, Causa raíz).
+The concrete mechanism that triggers it is mundane, and that's exactly why it's dangerous. A firm's
+real flow is `intaker → junior QA paralegal → signing attorney`, and the attorney reviews at the speed
+of *"50 intakes in 5 minutes"*. **If the skill occupies the paralegal's cognitive space with a closed
+verdict, the paralegal echoes it; if the paralegal echoes, the attorney signs on an echo.** The review
+chain collapses without anyone having done anything wrong (ADR-032, Context).
 
-### Lo que emite el sistema
+That's why disclaimers aren't enough. Keeping the conclusive labels while adding strong warnings was
+explicitly considered, and rejected: *"disclaimers don't protect against automation bias… the junior
+paralegal reads the label, not the disclaimer. **The word is the bias.**"* (ADR-032, Alternatives).
 
-Cuatro estados por elemento, y **ninguno es una conclusión sobre el caso** (ADR-035):
+---
 
-| Estado | Qué dice | Acción que dispara |
+## 3. Evidence assessment, not verdict
+
+The system's first version classified cases as `VENDE_ALTA`, `VENDE_CAVEATS`, `NO_VENDE`. That taxonomy
+**is dead**, and it's worth explaining why, because the why is more useful than the replacement.
+
+### There were two gradients, not one
+
+- **Factual gradient** — are the facts that make up the elements established in the intake?
+  **Yes, that belongs to the system.** It is verifiable against the form and the intake.
+- **Adjudicative gradient** — given the facts, is the case an A/B/C for the agency to approve?
+  **No, that does not belong to the system.** It belongs to the attorney, and it is **business risk
+  appetite**: two competent attorneys will grade the same intake differently because they have
+  different appetites. Some firms sell only A; others sell A/B/C.
+
+Hence the deeper reason, stronger than the rule itself: **the skill cannot classify strength because
+strength is not a property of the case.** It is a function of the attorney's lens. Any strength label
+the system emits claims to know a risk appetite that isn't its own — and that claimed knowledge becomes
+a shield ("the system approved it"), which is exactly the trap (ADR-034).
+
+There was also a mechanical problem: the original seven categories were **a gradient disguised as
+classes**. There is no objective boundary between "strong" and "partial". Asking a model to sort a
+continuum into discrete classes makes it collapse toward the simplest category. No prompt refinement
+fixes it: **the bug comes from the framework, not the model** (ADR-034, Root cause).
+
+### What the system emits
+
+Four states per element, and **none of them is a conclusion about the case** (ADR-035):
+
+| State | What it says | Action it triggers |
 |---|---|---|
-| `present` | Hay evidencia afirmativa capturada en el intake. **No** significa elemento legalmente satisfecho ni caso fuerte. | continuar |
-| `no_confirmado` | El intake no capturó lo suficiente. **Ausencia de evidencia, NO evidencia negativa.** | rescreening |
-| `bright_line_no` | Respuesta negativa dispositiva a una pregunta concreta. Exige `source_question` + `source_answer`. | cerrar el vector |
-| `no_aplica` | El vector no pertenece al caso según los hechos capturados. | excluir el vector |
+| `present` | Affirmative evidence is captured in the intake. **Does not** mean the element is legally satisfied or that the case is strong. | continue |
+| `no_confirmado` | The intake did not capture enough. **Absence of evidence, NOT negative evidence.** | rescreening |
+| `bright_line_no` | Dispositive negative answer to a concrete question. Requires `source_question` + `source_answer`. | close the vector |
+| `no_aplica` | The vector does not belong to the case per the captured facts. | exclude the vector |
 
-La frase que más trabajo hace en todo el sistema: **`no_confirmado` significa "no se capturó", jamás "no
-califica".** Dado el perfil de falsos negativos en trata —miedo, no-comprensión, no-recuerdo— el
-silencio no prueba que algo no ocurrió (ADR-034 §4).
+The sentence doing the most work in the entire system: **`no_confirmado` means "not captured", never
+"does not qualify".** Given the false-negative profile in trafficking — fear, non-comprehension,
+non-recall — silence does not prove that something did not happen (ADR-034 §4).
 
-Tres reglas de forma sostienen eso (ADR-035):
+Three formal rules sustain that (ADR-035):
 
-- **`basis` obligatorio en todos los estados.** Sin ancla a preguntas o hechos concretos del intake, no
-  hay estado. El modelo no puede afirmar sin mostrar dónde lo leyó.
-- **`bright_line_no` exige `source_question` + `source_answer` estructurados**, no enterrados en prosa.
-  Cerrar un vector es el acto más consecuente del sistema, así que es el que más rastro deja.
-- **Prohibido cualquier estado de fuerza** (`partial`, `weak`, `strong`, `likely`). La debilidad
-  observable se describe en prosa para el abogado, nunca como campo.
+- **`basis` is mandatory in every state.** Without an anchor to concrete questions or facts in the
+  intake, there is no state. The model cannot assert without showing where it read it.
+- **`bright_line_no` requires structured `source_question` + `source_answer`**, not buried in prose.
+  Closing a vector is the most consequential act the system performs, so it is the one that leaves the
+  most trace.
+- **Any strength state is forbidden** (`partial`, `weak`, `strong`, `likely`). Observable weakness is
+  described in prose for the attorney, never as a field.
 
-Y una propiedad horneada en la geometría: **el residual bajo ambigüedad es `no_confirmado` → preguntar
-de nuevo, nunca `bright_line_no` → cerrar.** El modo de falla conservador no es una instrucción que el
-modelo pueda olvidar; es la forma del espacio de estados (ADR-035).
+And one property is baked into the geometry: **the residual under ambiguity is `no_confirmado` → ask
+again, never `bright_line_no` → close.** The conservative failure mode is not an instruction the model
+can forget; it is the shape of the state space (ADR-035).
 
-"Elementos completos" tampoco significa "vende". Significa que los hechos están en el intake. Si el
-abogado decide ir, **el reframe legal vive en el filing** —declaración y cover letter—, no en el intake
-ni en la skill. Confundir esas capas degrada cada disciplina (ADR-034 §8).
+"Elements complete" doesn't mean "sells" either. It means the facts are in the intake. If the attorney
+decides to proceed, **the legal reframe lives in the filing** — declaration and cover letter — not in
+the intake and not in the skill. Conflating those layers degrades each discipline (ADR-034 §8).
 
 ---
 
-## 4. Soporte cognitivo: concentrar el juicio humano, no reemplazarlo
+## 4. Cognitive support: concentrating human judgment, not replacing it
 
-La pregunta de diseño no es *"¿cuánto puede decidir la máquina?"* sino *"¿dónde tiene que estar mirando
-el humano?"*. Un sistema que decide poco pero **concentra la atención del abogado en las tres cosas que
-sólo él puede resolver** vale más que uno que decide mucho y lo deja revisando ruido.
+The design question is not *"how much can the machine decide?"* but *"where does the human need to be
+looking?"*. A system that decides little but **concentrates the attorney's attention on the three things
+only they can resolve** is worth more than one that decides a lot and leaves them reviewing noise.
 
-El motor de análisis se diseña como **cadena de filtros socráticos, no como pipeline de decisión**
-(ADR-032 §4). Cada capa fuerza a la siguiente a pensar:
+The analysis engine is designed as a **chain of Socratic filters, not a decision pipeline** (ADR-032
+§4). Each layer forces the next one to think:
 
-- el recomendador de intake fuerza al intaker a re-capturar lo que falta;
-- el specialist fuerza al paralegal a rescreenear o repensar antes de pasar al abogado;
-- la firma del abogado es el cierre.
+- the intake recommender pushes the intaker to re-capture what's missing;
+- the specialist pushes the paralegal to rescreen or rethink before passing the case to the attorney;
+- the attorney's signature is the close.
 
-**Ninguna capa cierra el juicio de la capa siguiente. Cada una alimenta su insumo.**
+**No layer closes the judgment of the next layer. Each one feeds the next one's input.**
 
-Concretamente, cada duda que aparece se rutea a uno de tres destinos:
+Concretely, every doubt that surfaces is routed to one of three destinations:
 
-| Lo que aparece | A dónde va | Por qué |
+| What surfaces | Where it goes | Why |
 |---|---|---|
-| **Un gap** — el intake no capturó el hecho | → **una pregunta** (rescreening) | `no_confirmado` tiene una sola acción de funnel: volver a preguntar (ADR-035) |
-| **Una frontera generalizable** — el mismo umbral se repite caso tras caso | → **una regla firmada** por un humano con licencia | La autoridad dispositiva sólo puede existir donde la regla es humana, explícita y auditable (ADR-035); la regla se modela como entidad con `approved_by`, `rationale`, `effective_date` (ADR-036) |
-| **Una frontera particular** — este caso, este umbral, este apetito de riesgo | → **el abogado** | Es el gradiente adjudicativo, que no es del sistema (ADR-034 §6) |
+| **A gap** — the intake did not capture the fact | → **a question** (rescreening) | `no_confirmado` has exactly one funnel action: ask again (ADR-035) |
+| **A generalizable boundary** — the same threshold recurs case after case | → **a rule signed** by a licensed human | Dispositive authority can only exist where the rule is human, explicit, and auditable (ADR-035); the rule is modeled as an entity with `approved_by`, `rationale`, `effective_date` (ADR-036) |
+| **A particular boundary** — this case, this threshold, this risk appetite | → **the attorney** | This is the adjudicative gradient, which does not belong to the system (ADR-034 §6) |
 
-> El *criterio de promoción* —cuándo una frontera es lo bastante generalizable para volverse regla
-> firmada— es **criterio abierto: se define con la práctica**, no con un umbral horneado de antemano.
-> El funnel de arriba es fiel a las fuentes en sus tres destinos; el umbral de la fila del medio se va
-> fijando caso a caso, con la autoridad de un abogado con licencia, en vez de simular que ya existe uno.
+> The *promotion criterion* — when a boundary is generalizable enough to become a signed rule — is an
+> **open criterion: it gets defined through practice**, not through a threshold baked in ahead of time.
+> The funnel above is faithful to the sources across its three destinations; the threshold in the middle
+> row gets fixed case by case, under a licensed attorney's authority, instead of pretending one already
+> exists.
 
-La ganancia real: el abogado deja de gastar atención en *encontrar* lo que falta y la gasta en *decidir*
-lo que sólo él puede decidir. Eso es lo que quiere decir "liberar al humano para que sea más humano".
+The real gain: the attorney stops spending attention *finding* what's missing and spends it *deciding*
+what only they can decide. That is what "freeing the human to be more human" means.
 
-Hay un límite ético en la misma frontera. El sistema persigue **lo que el cliente está dispuesto a
-revelar ante preguntas competentes y honestas, no la verdad material**. No inventamos, no exageramos, no
-hacemos leading ni pushing. Ante negación competente en todos los vectores, el análisis se cierra —
-aunque sepamos que un falso negativo por miedo es posible. La alternativa (empujar para extraer
-testimonio) produce el daño que más importa evitar en trata: testimonio inducido, revictimización, y un
-caso que colapsa ante el adjudicador. **La negación competente es el piso del sistema: un pase honesto,
-no un bucle** (ADR-034 §7).
+There is an ethical limit at the same boundary. The system pursues **what the client is willing to
+disclose under competent, honest questioning — not the material truth**. We do not invent, we do not
+exaggerate, we do not lead or push. Faced with competent denial across all vectors, the analysis closes
+— even knowing that a fear-driven false negative is possible. The alternative (pushing to extract
+testimony) produces the harm that matters most to avoid in trafficking: induced testimony,
+re-victimization, and a case that collapses before the adjudicator. **Competent denial is the floor of
+the system: an honest pass, not a loop** (ADR-034 §7).
 
 ---
 
-## 5. Anti-gradiente: lo que puede ser tabla, es tabla
+## 5. Anti-gradient: what can be a table, is a table
 
-Un principio de ingeniería que resultó ser también un principio ético.
+An engineering principle that turned out to also be an ethical one.
 
-Cada vez que se le pide a un modelo de lenguaje que resuelva algo que **podría haber sido una
-estructura**, pasan dos cosas malas a la vez: el resultado se vuelve inestable —los modelos colapsan
-continuos hacia la categoría más simple (ADR-034)— y la decisión se vuelve **opaca**, porque queda
-dentro del modelo en vez de estar escrita donde alguien pueda discutirla.
+Every time a language model is asked to resolve something that **could have been a structure**, two bad
+things happen at once: the result becomes unstable — models collapse continua toward the simplest
+category (ADR-034) — and the decision becomes **opaque**, because it stays inside the model instead of
+being written down where someone can argue with it.
 
-El criterio operativo que ordena esto es la **monotonicidad operacional**: *una categoría existe si y
-sólo si dispara una acción distinta*. Es un test más fuerte que cualquier argumento semántico. `partial`
-murió por ese test: a veces significaba "pregunta más", a veces "que lo vea el abogado", a veces "sólo
-una nota" — no tenía acción propia, así que no era una categoría (ADR-035).
+The operative criterion that organizes this is **operational monotonicity**: *a category exists if and
+only if it triggers a distinct action*. It is a stronger test than any semantic argument. `partial` died
+by that test: sometimes it meant "ask more", sometimes "let the attorney see it", sometimes "just a
+note" — it had no action of its own, so it wasn't a category (ADR-035).
 
-La consecuencia arquitectónica más nítida está en cómo se separan el modelo y las reglas (ADR-036):
+The sharpest architectural consequence is in how the model and the rules are separated (ADR-036):
 
-- **El specialist NO consulta reglas.** Emite el estado con su `basis`, su `source_question` y su
-  `source_answer` — un evento fáctico sobre el intake.
-- **El motor** —capa separada— verifica si alguna regla humana matchea ese `(pregunta, respuesta)` y
-  aplica lo que esa regla autoriza.
+- **The specialist does NOT consult rules.** It emits the state with its `basis`, its `source_question`,
+  and its `source_answer` — a factual event about the intake.
+- **The engine** — a separate layer — checks whether any human rule matches that `(question, answer)`
+  pair and applies whatever that rule authorizes.
 
-El modelo no sabe qué reglas existen. Ese desacoplamiento es lo que permite que el mismo specialist
-sirva a firmas con doctrinas distintas, y —más importante— **mantiene la autoridad dispositiva fuera del
-modelo de lenguaje**, en una entidad humana y auditable.
+The model does not know which rules exist. That decoupling is what lets the same specialist serve firms
+with different doctrines, and — more importantly — **keeps dispositive authority outside the language
+model**, in a human, auditable entity.
 
-Mismo principio en el retrieval: el agente **no adivina dónde buscar**. Un mapa determinístico liga cada
-disparador a su fuente exacta dentro del corpus, y *"un alias que no esté en la tabla no es una ruta"*.
-Si un disparador no tiene fila, la respuesta no es improvisar la fuente — es declarar el hueco
+Same principle in retrieval: the agent **does not guess where to look**. A deterministic map binds each
+trigger to its exact source within the corpus, and *"an alias that isn't in the table isn't a route"*.
+If a trigger has no row, the answer isn't to improvise the source — it is to declare the gap
 (`retrieval/retrieval-map.md`).
 
-Destilado en una línea: **el LLM lee lo que no puede ser estructura; todo lo demás es tabla.**
+Distilled into one line: **the LLM reads what cannot be structure; everything else is a table.**
 
-El corolario es que la estructura tiene que estar construida **para el error, no para el acierto**. Todo
-output de AI lleva undo, override (editarlo a mano) y "marcar como incorrecto" — y esa señal de
-corrección **se persiste y alimenta las evals**. La regla de review es explícita al respecto: si la
-respuesta a alguna de esas es *"no hace falta porque el output es bueno"*, se para. **El output va a
-fallar; la única pregunta es cuándo y cómo lo corrige el humano** (`docs/snake-oil-filter.md`). Un
-sistema que no tiene dónde registrar su propio error no es confiable: es sólo silencioso.
+The corollary is that the structure has to be built **for error, not for success**. Every AI output
+carries undo, override (hand-editing it), and "mark as incorrect" — and that correction signal **is
+persisted and feeds the evals**. The review rule is explicit about this: if the answer to any of those
+is *"not needed, because the output is good"*, stop. **The output is going to fail; the only question
+is when, and how the human corrects it** (`docs/snake-oil-filter.md`). A system with nowhere to record
+its own error is not trustworthy: it is only silent.
 
 ---
 
-## 6. Jerarquía de autoridad y fidelidad a la fuente
+## 6. Authority hierarchy and fidelity to the source
 
-Un sistema legal que cita mal es peor que uno que no cita.
+A legal system that cites badly is worse than one that doesn't cite at all.
 
-Las afirmaciones doctrinales se anclan en una **jerarquía de autoridad** explícita —estatuto,
-regulación, política de la agencia, jurisprudencia— y el nivel **viaja con la cita**: un fallo de
-distrito y un estatuto no pesan igual, y el output no debe aplanarlos.
+Doctrinal claims are anchored in an explicit **authority hierarchy** — statute, regulation, agency
+policy, case law — and the level **travels with the citation**: a district court ruling and a statute do
+not carry the same weight, and the output must not flatten them.
 
-### La jerarquía es una elección, y la mostramos
+### The hierarchy is a choice, and we show it
 
-Acá conviene ser transparente en lugar de decretar. **No existe una única jerarquía correcta que
-podamos entregar empaquetada**: el orden depende de para qué se la usa, y cada firma —cada abogado
-responsable— tendrá que **hacerla propia**. Nosotros elegimos la nuestra y la dejamos a la vista, que es
-lo único honesto que se puede hacer con una decisión que no es universal.
+Here it is better to be transparent than to decree. **There is no single correct hierarchy we can hand
+over pre-packaged**: the order depends on what it's used for, and every firm — every responsible
+attorney — will have to **make it their own**. We chose ours and put it in plain sight, which is the only
+honest thing to do with a decision that isn't universal.
 
-Nuestra elección son **dos órdenes para dos preguntas distintas**, y confundirlos es el error que vale
-evitar:
+Our choice is **two orderings for two different questions**, and conflating them is the error worth
+avoiding:
 
-| La pregunta | El orden que usamos | Por qué |
+| The question | The ordering we use | Why |
 |---|---|---|
-| **¿Qué manda como derecho?** (autoridad de la ley) | estatuto → regulación → jurisprudencia → política de la agencia | Es la jerarquía de fuentes del derecho. Un manual de política no supera a un tribunal (ADR-034 §3) |
-| **¿Cómo va a resolver esto el adjudicador?** (orden de consulta del agente) | estatuto → regulación → **política de la agencia** → jurisprudencia persuasiva | El agente evalúa **cómo adjudicaría la agencia**; su manual de política gobierna al adjudicador aunque no gobierne a un tribunal. Los casos **persuaden, no mandan** (decisión 2026-08-19) |
+| **What governs as law?** (authority of the law) | statute → regulation → case law → agency policy | This is the hierarchy of sources of law. A policy manual does not outrank a court (ADR-034 §3) |
+| **How will the adjudicator resolve this?** (the agent's consultation order) | statute → regulation → **agency policy** → persuasive case law | The agent assesses **how the agency would adjudicate**; its policy manual governs the adjudicator even though it does not govern a court. Cases **persuade, they do not command** (decision of 2026-08-19) |
 
-La diferencia no es una inconsistencia: es que **"qué es más autoritativo" y "qué predice mejor la
-decisión que estamos anticipando" son preguntas distintas**, y un sistema que las colapsa va a citar
-bien y predecir mal, o al revés.
+The difference is not an inconsistency: it's that **"what is more authoritative" and "what better
+predicts the decision we're anticipating" are different questions**, and a system that collapses them
+will either cite well and predict badly, or the reverse.
 
-Por eso el paquete está diseñado para que **esa elección sea configurable, no horneada**. Es la misma
-lógica que mantiene las reglas dispositivas fuera del modelo (§5): si la doctrina de cada firma vive en
-entidades humanas y auditables, su jerarquía de consulta también debe poder vivir ahí. Una firma con
-otro apetito, otra jurisdicción u otro foro tiene que poder ordenar sus fuentes distinto **sin tocar el
-motor** — y sin heredar en silencio la elección de otro.
+That's why the package is designed so that **this choice is configurable, not baked in**. It's the same
+logic that keeps dispositive rules outside the model (§5): if each firm's doctrine lives in human,
+auditable entities, its consultation hierarchy should be able to live there too. A firm with a different
+appetite, a different jurisdiction, or a different forum has to be able to order its sources differently
+**without touching the engine** — and without silently inheriting someone else's choice.
 
-Dos disciplinas sostienen la fidelidad, y las dos nacieron de errores reales:
+Two disciplines sustain fidelity, and both were born from real errors:
 
-**Verbatim contra la fuente cruda, no contra el resumen.** Una premisa central del framework —que cierto
-tipo de daño era una exclusión categórica— resultó ser una **mala lectura de la propia fuente**: el
-texto real decía *"generally… solely… totality"*, y la lectura endurecida había soltado esas tres
-palabras. El cierre no cayó por jerarquía; cayó por leer el original. De ahí la regla: **verbatim sobre
-paráfrasis en toda fuente que sostenga un cierre** (ADR-038). Y su corolario incómodo: cuando una
-corrección así aparece, **es retroactiva** — se re-revisa todo caso previo que se apoyó en la lectura
-corregida, no sólo el que la surfaceó.
+**Verbatim against the raw source, not against the summary.** A central premise of the framework — that
+a certain kind of harm was a categorical exclusion — turned out to be a **misreading of the source
+itself**: the real text said *"generally… solely… totality"*, and the hardened reading had dropped those
+three words. The closure didn't fall because of hierarchy; it fell from reading the original. Hence the
+rule: **verbatim over paraphrase in every source that sustains a closure** (ADR-038). And its
+uncomfortable corollary: when a correction like that surfaces, **it is retroactive** — every prior case
+that relied on the corrected reading gets re-reviewed, not only the one that surfaced it.
 
-**La jerarquía es un instrumento para el conflicto, no una explicación por defecto.** Cuando dos niveles
-coinciden, lo que resuelve es la coincidencia, no el outranking. No se gasta la jerarquía
-retroactivamente en casos que no tuvieron conflicto (ADR-038 §5).
+**Hierarchy is an instrument for conflict, not a default explanation.** When two levels agree, what
+resolves the question is the agreement, not the outranking. Hierarchy is not spent retroactively on
+cases that had no conflict (ADR-038 §5).
 
-A eso se suma el modo de falla real del RAG legal, que no es el que se suele nombrar: **no es la cita
-inventada** —un corpus verificado la cubre— **sino la cita real pegada a una provisión que ya cambió**.
-El antídoto es tratar la vigencia como dato de primera clase (`effective_date`), no como suposición
-(ADR-036).
+On top of that, there's the real failure mode of legal RAG, and it isn't the one usually named: **it
+isn't the fabricated citation** — a verified corpus covers that — **it's the real citation attached to a
+provision that has since changed**. The antidote is treating currency as a first-class field
+(`effective_date`), not as an assumption (ADR-036).
 
 ---
 
-## 7. El método
+## 7. The method
 
-El método de construcción es parte del producto. Un sistema cuya tesis es "deje rastro" no puede
-construirse sin dejarlo.
+The construction method is part of the product. A system whose thesis is "leave a trace" cannot be
+built without leaving one.
 
-**Auditabilidad sobre perfección.** No porque la corrección no importe, sino como jerarquía cuando las
-dos compiten: entre un sistema que parece más certero pero es opaco y uno que admite su incertidumbre
-pero es trazable, se elige el segundo. *"La perfección es una propiedad que se reclama; la auditabilidad
-es una que se ofrece. La perfección le pide al otro que confíe; la auditabilidad le da los medios para
-verificar y, si hace falta, contradecir"* (`docs/fundamento.md`). Con su propia cautela: el principio
-vale cuando la auditabilidad *compite* con la perfección, nunca cuando la *reemplaza*. Usar "total, es
-auditable" para no arreglar una regla deficiente invierte el principio.
+**Auditability over perfection.** Not because correctness doesn't matter, but as a hierarchy for when
+the two compete: between a system that looks more certain but is opaque and one that admits its
+uncertainty but is traceable, the second is chosen. *"Perfection is a property one claims; auditability
+is one that is offered. Perfection asks the other party to trust; auditability gives them the means to
+verify and, if needed, to contradict"* (`docs/fundamento.md`). With its own caveat: the principle holds
+when auditability *competes* with perfection, never when it *replaces* it. Using "well, it's auditable"
+as an excuse not to fix a deficient rule inverts the principle.
 
-**Objetividad parcial.** Los dominios humanos son interpretables por naturaleza, y eso no es un defecto
-a reparar con más formalización. Pero interpretable no es relativista: hay lecturas correctas y lecturas
-insostenibles. Las dos alternativas destruirían el proyecto — el objetivismo duro llevaría a que el
-sistema decida (viola el séptimo principio); el relativismo volvería inútil la auditoría. El proyecto
-vive en el medio, y esa es *"la más exigente de las tres posturas: quien la sostiene carga con
-argumentar cuál lectura es mejor y por qué, sabiendo que su argumento es contestable"*
-(`docs/fundamento.md`).
+**Partial objectivity.** Human domains are interpretable by nature, and that is not a flaw to be fixed
+with more formalization. But interpretable is not relativist: there are sound readings and untenable
+ones. Both alternatives would destroy the project — hard objectivism would end with the system deciding
+(violating the seventh principle); relativism would make auditing pointless. The project lives in
+between, and that is *"the most demanding of the three positions: whoever holds it carries the burden of
+arguing which reading is better and why, knowing their argument is contestable"* (`docs/fundamento.md`).
 
-**La autoridad viene de la evidencia que se puede mostrar, no de la posición que se ocupa.** Aplica al
-specialist, a la regla, al abogado — y también al examen. Cuando el eval y el caso chocan, **ninguno de
-los dos retiene presunción de corrección**: se abre el caso y decide la evidencia. La presunción no se
-pierde automáticamente; se pierde **por trabajo** (ADR-037 Regla 1). Y toda corrección del ground truth
-lleva la misma autoría auditable que el sistema exige de un cierre — *"sin ese rastro, 'auditamos el
-ground truth' se vuelve el eufemismo de 'ajustamos el examen'"* (ADR-037 Regla 3).
+**Authority comes from evidence that can be shown, not from the position one occupies.** It applies to
+the specialist, to the rule, to the attorney — and to the exam itself. When the eval and the case
+collide, **neither one retains a presumption of correctness**: the case is reopened and the evidence
+decides. The presumption isn't lost automatically; it is lost **through work** (ADR-037 Rule 1). And
+every correction to the ground truth carries the same auditable authorship the system demands of a
+closure — *"without that trace, 'we audited the ground truth' becomes a euphemism for 'we adjusted the
+exam'"* (ADR-037 Rule 3).
 
-**El consenso no es señal de verdad.** Tres análisis independientes coincidieron una vez en el
-diagnóstico equivocado porque los tres compartían una premisa oculta. El antídoto no es un análisis más
-listo: es ir al **dato crudo** que probaría o rompería la premisa que todos asumen. Disciplina:
-**cuando todos coinciden, hacer explícita la premisa compartida y verificarla contra el dato primario**
-(ADR-037 Regla 5).
+**Consensus is not a signal of truth.** Three independent analyses once converged on the same wrong
+diagnosis because all three shared a hidden premise. The antidote is not a smarter analysis: it is going
+to the **raw data** that would prove or break the premise everyone assumes. Discipline: **when everyone
+agrees, make the shared premise explicit and check it against the primary data** (ADR-037 Rule 5).
 
-### El mentor de AI
+### The AI mentor
 
-Este rol no se diseñó en abstracto: **se practicó primero, se formalizó después, y se nombró al final.**
+This role wasn't designed in the abstract: **it was practiced first, formalized later, and named last.**
 
-Empezó como una práctica de trabajo en mayo de 2026 — sesiones **dialécticas** donde dos modelos
-distintos operaban como **contrapesos por turnos**, con el fundador como filtro humano. La regla que
-emergió de ahí es la que sostiene todo lo demás: **reforzar la dinámica dialéctica con filtro humano,
-no validación mutua entre AIs.** Dos modelos que se dan la razón no producen verdad; producen un punto
-ciego con dos testigos.
+It began as a working practice in May 2026 — **dialectical** sessions where two different models acted
+as **counterweights taking turns**, with the founder as the human filter. The rule that emerged from
+that is the one holding up everything else: **reinforce the dialectical dynamic with a human filter, not
+mutual validation between AIs.** Two models agreeing with each other don't produce truth; they produce a
+blind spot with two witnesses.
 
-Esa práctica se formalizó como un **rol de orquestación** con una línea de autoridad explícita —quién
-verifica conformidad y quién decide— y hoy el fundador le pone nombre: **el mentor de AI**.
+That practice was formalized as an **orchestration role** with an explicit line of authority — who
+verifies conformity and who decides — and today the founder gives it a name: **the AI mentor**.
 
-Es un tercer rol que se sienta sobre el humano y sobre el AI ejecutor, y cuya función no es producir
-trabajo ni aprobarlo, sino **cuestionar con rigor epistemológico y lógico a los dos lados**.
+It is a third role that sits above both the human and the executing AI, and whose function is neither
+to produce work nor to approve it, but to **question both sides with epistemological and logical
+rigor**.
 
-- **Al humano**: ¿de dónde sale esa premisa? ¿es coherente con lo que firmaste antes? ¿esa cita dice lo
-  que decís que dice?
-- **Al AI ejecutor**: ¿esto cumple la spec o sólo lo parece? ¿esto es evidencia o es tu reporte de que
-  hay evidencia?
+- **To the human**: where does that premise come from? is it coherent with what you signed off on
+  before? does that citation say what you say it says?
+- **To the executing AI**: does this meet the spec, or does it just look like it does? is this evidence,
+  or is it your report that evidence exists?
 
-La distinción operativa que hace útil el rol: **verificar contra la fuente, no contra el reporte de
-quien hizo el trabajo.** Un ejecutor que dice "verifiqué" no ha verificado nada desde el punto de vista
-del sistema; la verificación existe cuando se puede mostrar contra el dato.
+The operative distinction that makes the role useful: **verify against the source, not against the
+report of whoever did the work.** An executor who says "I verified it" has verified nothing from the
+system's point of view; verification exists when it can be shown against the data.
 
-Y su límite, que es el mismo del resto del edificio: **el mentor no decide por ninguno de los dos.**
-Cuestiona premisas, exige evidencia, nombra incoherencias — y devuelve la decisión a quien le
-corresponde. Los humanos con licencia deciden.
+And its limit, which is the same as the rest of the building: **the mentor does not decide for either
+of them.** It questions premises, demands evidence, names incoherences — and hands the decision back to
+whoever it belongs to. Licensed humans decide.
 
-Conviene decir por qué el rol existe como **rol** y no como buena intención. Tres disciplinas escritas
-lo sostienen, y las tres nacieron de errores concretos:
+It's worth saying why the role exists as a **role** and not as good intentions. Three written
+disciplines hold it up, and all three were born from concrete errors:
 
-- **Atacar la premisa compartida.** Cuando varios análisis convergen, el consenso no es señal de verdad
-  — puede ser un punto ciego común. La disciplina es hacer explícita la premisa que todos asumen y
-  verificarla contra el dato primario (ADR-037 Regla 5).
-- **Separar conformidad de decisión.** Verificar que un entregable cumple la spec y decidir si el
-  proyecto lo adopta son actos distintos, de manos distintas. El mentor hace el primero y **nunca** el
-  segundo.
-- **Verificar contra el estado real, no contra el reporte.** Ningún ejecutor —humano o AI— establece un
-  hecho por afirmarlo.
+- **Attack the shared premise.** When several analyses converge, consensus is not a signal of truth —
+  it can be a shared blind spot. The discipline is to make explicit the premise everyone assumes and
+  check it against the primary data (ADR-037 Rule 5).
+- **Separate conformity from decision.** Verifying that a deliverable meets the spec and deciding
+  whether the project adopts it are distinct acts, done by distinct hands. The mentor does the first and
+  **never** the second.
+- **Verify against real state, not against the report.** No executor — human or AI — establishes a fact
+  by asserting it.
 
-*(La línea de autoridad y la regla de verificación están formalizadas en el documento de arquitectura de
-orquestación del proyecto.)*
+*(The line of authority and the verification rule are formalized in the project's orchestration
+architecture document.)*
 
-Cierra el mismo principio con el que abre todo: **el sistema captura, organiza y muestra su trabajo; los
-humanos con licencia deciden.** Esa línea no se cruza por economía operativa, presión de volumen, ni
-confianza acumulada en la herramienta.
+It closes on the same principle that opens everything: **the system captures, organizes, and shows its
+work; licensed humans decide.** That line is not crossed for operational economy, volume pressure, or
+accumulated trust in the tool.
