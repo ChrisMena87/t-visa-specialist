@@ -5,11 +5,10 @@
 ### Design criteria of the T-Visa specialist
 
 > [!CAUTION]
-> **This software is not a substitute for the advice of an attorney. / Este software no sustituye el
-> consejo de un abogado.** Es un laboratorio experimental: no está en producción, no se ha utilizado
-> para evaluar ningún caso de ningún cliente, y ninguna decisión legal o comercial se ha tomado a
-> partir de esta herramienta. Uso previsto: bajo supervisión de abogados con licencia. Ver el aviso
-> completo en el [README](./README.en.md).
+> **This software is not a substitute for the advice of an attorney.** This is an experimental
+> laboratory: it is not in production, it has not been used to evaluate any client's case, and no
+> legal or business decision has been made based on this tool. Intended use: under the supervision
+> of licensed attorneys. See the full notice in the [README](./README.en.md).
 
 ---
 

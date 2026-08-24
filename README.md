@@ -3,28 +3,19 @@
 # T-Visa Specialist
 
 > [!CAUTION]
-> # ⚠️ EXPERIMENTAL LABORATORY — NOT FOR PRODUCTION USE
 > # ⚠️ LABORATORIO EXPERIMENTAL — NO USAR EN PRODUCCIÓN
 >
-> ### **This software is not a substitute for the advice of an attorney.**
 > ### **Este software no sustituye el consejo de un abogado.**
 >
-> - **Not in production.** This system has never been used to evaluate any client's case.
->   **No legal or commercial decision has ever been made based on this tool.**
 > - **No está en producción.** Este sistema no se ha utilizado para evaluar ningún caso de ningún
 >   cliente. **Ninguna decisión legal ni comercial se ha tomado a partir de esta herramienta.**
-> - **It does not replace human judgment — by design.** Its outputs are never eligibility
->   determinations: they organize evidence for licensed professionals, who make every decision.
 > - **No reemplaza el juicio humano — por diseño.** Sus salidas nunca son determinaciones de
 >   elegibilidad: organizan evidencia para profesionales con licencia, que toman todas las decisiones.
-> - **The embedded legal corpus is a dated snapshot** (see [`corpus/MANIFEST.md`](./corpus/MANIFEST.md)).
->   The law changes — always verify against primary sources.
->   **El corpus legal es un snapshot con fecha.** La ley cambia — verifica siempre contra fuente primaria.
+> - **El corpus legal es un snapshot con fecha** (ver [`corpus/MANIFEST.md`](./corpus/MANIFEST.md)).
+>   La ley cambia — verifica siempre contra fuente primaria.
 >
-> **Intended use / Uso previsto:** research, evaluation, and operation under the supervision of
-> licensed attorneys. Any other use is outside the design and the intent of this project. /
-> Investigación, evaluación y operación bajo supervisión de abogados con licencia. Cualquier otro
-> uso queda fuera del diseño y de la intención de este proyecto.
+> **Uso previsto:** investigación, evaluación y operación bajo supervisión de abogados con licencia.
+> Cualquier otro uso queda fuera del diseño y de la intención de este proyecto.
 
 Un agente de análisis para T-Visa (`8 USC 1101(a)(15)(T)`) — evalúa evidencia de un intake contra el
 canon legal y reporta qué elementos captura y en qué estado. Se entrega como paquete standalone: prompt,
